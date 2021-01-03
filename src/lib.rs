@@ -15,13 +15,15 @@ pub struct Light {
 }
 
 impl Light {
+    async fn update(&mut self, r: u8, g: u8, b: u8) -> Result<(), Error> {
+        let buffer = [4u8, 0u8, 0u8, 0u8, 0u8, r, g, b];
+        self.socket.write_all(&buffer).await
+    }
     pub async fn turn_on(&mut self) -> Result<(), Error> {
-        self.socket
-            .write_all(format!("{},{},{}\n", self.red, self.green, self.blue).as_bytes())
-            .await
+        self.update(self.red, self.green, self.blue).await
     }
     pub async fn turn_off(&mut self) -> Result<(), Error> {
-        self.socket.write_all("0,0,0".as_bytes()).await
+        self.update(0, 0, 0).await
     }
     pub async fn set_color(&mut self, color: (u8, u8, u8)) -> Result<(), Error> {
         self.red = color.0;
