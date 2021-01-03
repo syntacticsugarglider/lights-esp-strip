@@ -19,6 +19,12 @@ impl Light {
         let buffer = [4u8, 0u8, 0u8, 0u8, 0u8, r, g, b];
         self.socket.write_all(&buffer).await
     }
+    pub async fn program(&mut self, binary: &[u8]) -> Result<(), Error> {
+        let mut buffer = (binary.len() as u32 + 1).to_le_bytes().to_vec();
+        buffer.extend(Some(1u8));
+        buffer.extend(binary);
+        self.socket.write_all(&buffer).await
+    }
     pub async fn turn_on(&mut self) -> Result<(), Error> {
         self.update(self.red, self.green, self.blue).await
     }
